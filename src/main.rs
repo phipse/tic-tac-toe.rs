@@ -147,3 +147,56 @@ fn main() {
                          else { Player::Px };
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_new_field_is_empty() {
+        let field = Field::new();
+        for x in field.field.chars() {
+            assert!(x == '-');
+        }
+    }
+
+    #[test]
+    fn a_new_field_has_no_winner() {
+        let field = Field::new();
+        assert!(field.check_win() == Player::No);
+    }
+
+    #[test]
+    fn a_new_field_has_possible_moves() {
+        let field = Field::new();
+        assert!(field.move_left());
+    }
+
+    #[test]
+    fn px_does_not_win_on_a_new_field() {
+        let field = Field::new();
+        assert!(!field.check_win_p(&Player::Px));
+    }
+
+    #[test]
+    fn po_does_not_win_on_a_new_field() {
+        let field = Field::new();
+        assert!(!field.check_win_p(&Player::Po));
+    }
+
+    #[test]
+    fn each_move_of_px_is_valid_on_an_empty_field() {
+        for x in [0, 1, 2, 3, 4, 5, 6, 7, 8] {
+            let mut field = Field::new();
+            assert!(field.make_move(&Player::Px, x));
+        }
+    }
+
+    #[test]
+    fn each_move_of_po_is_valid_on_an_empty_field() {
+        for x in [0, 1, 2, 3, 4, 5, 6, 7, 8] {
+            let mut field = Field::new();
+            assert!(field.make_move(&Player::Po, x));
+        }
+    }
+}
