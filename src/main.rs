@@ -34,46 +34,25 @@ impl Field {
         self.field.chars().nth(idx).unwrap()
     }
 
-    fn val(&self, idx: usize) -> String {
-        self.val_c(idx).to_string()
-    }
-
     fn check_win_p(&self, player: &Player) -> bool {
         let marker = player_marker(&player);
-        let win_seq = format!("{}{}{}", marker, marker, marker);
+        let win_opts = [(0,1,2), (3,4,5), (6,7,8), // lines
+                        (0,3,6), (1,4,7), (2,5,8), // cols
+                        (0,4,8), (2,4,6)]; // diags
 
-//        println!("DEBUG: check win for {} with sequence {}", marker, win_seq);
-//        self.print();
-
-        for n in [0, 3, 6] {
-            let line = self.field.get(n..n+3);
-//            println!("DEBUG: check_win: line is {:?}", line);
-            if line.unwrap() == win_seq {
+        for x in win_opts.iter() {
+            let mut chars = self.field.chars();
+            // XXX nth advances iterator
+            // FIX 1: compute the distance to the previous field in win_opts and
+            //        substract one to start from zero.
+            let a = chars.nth(x.0);
+            let b = chars.nth(x.1 - x.0 - 1);
+            let c = chars.nth(x.2 - x.1 - 1);
+            if a == b && b == c && c == Some(marker) {
                 return true;
             }
         }
-
-        for n in 0..3 {
-            let col = self.val(n) + &self.val(n+3) + &self.val(n+6);
-//            println!("DEBUG: check_win: col is {}", col);
-            if col == win_seq {
-                return true;
-            }
-        }
-
-        let diag1 = self.val(0) + &self.val(4) + &self.val(8);
-//        println!("DEBUG: check_win: diag1 is {}", diag1);
-        if diag1 == win_seq {
-            return true;
-        }
-
-        let diag2 = self.val(2) + &self.val(4) + &self.val(6);
-//        println!("DEBUG: check_win: diag2 is {}", diag2);
-        if diag2 == win_seq {
-            return true;
-        }
-
-        false
+        return false;
     }
 
     fn check_win(&self) -> Player {
@@ -158,6 +137,7 @@ fn main() {
                 }
             }
             pl @ _ => {
+                play_field.print();
                 println!("Player {} wins!", player_marker(&pl)); 
                 break;
             }
