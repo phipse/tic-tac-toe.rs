@@ -203,4 +203,29 @@ mod tests {
             assert!(field.make_move(&Player::Po, x));
         }
     }
+
+    #[test]
+    fn winning_combinations_on_an_empty_field_are_wins() {
+        let wins = [(0,1,2), (3,4,5), (6,7,8), // lines
+                    (0,3,6), (1,4,7), (2,5,8), // cols
+                    (0,4,8), (2,4,6)]; // diags
+
+        for combination in wins {
+            for player in [Player::Px, Player::Po] {
+                let mut field = Field::new();
+                assert!(field.make_move(&player, combination.0));
+                assert!(!field.check_win_p(&player));
+
+                assert!(field.make_move(&player, combination.1));
+                assert!(!field.check_win_p(&player));
+
+                assert!(field.make_move(&player, combination.2));
+                assert!(field.check_win_p(&player));
+
+                let other_player = if player == Player::Px { Player::Po }
+                                   else { Player::Px };
+                assert!(!field.check_win_p(&other_player));
+            }
+        }
+    }
 }
