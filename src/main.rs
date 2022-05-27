@@ -112,40 +112,44 @@ fn players_turn(pl: &Player) {
     println!("Player's {} turn: ", player_marker(&pl));
 }
 
+fn game_loop() {
+  let mut play_field = Field::new();
+  let mut current_player = Player::Px;
+
+  loop {
+      play_field.print();
+      players_turn(&current_player);
+      let move_idx = read_move();
+
+      if !play_field.make_move(&current_player, move_idx) {
+          println!("invalid move; try again!");
+          continue;
+      }
+
+      match play_field.check_win() {
+          Player::No => {
+              if !play_field.move_left() {
+                  play_field.print();
+                  println!("No player wins!");
+                  break;
+              }
+          }
+          pl @ _ => {
+              play_field.print();
+              println!("Player {} wins!", player_marker(&pl));
+              break;
+          }
+      }
+
+      current_player = if current_player == Player::Px { Player::Po }
+                       else { Player::Px };
+  }
+}
+
 fn main() {
     println!("Hello, tic-tac-toe!");
 
-    let mut play_field = Field::new();
-    let mut current_player = Player::Px;
-
-    loop {
-        play_field.print();
-        players_turn(&current_player);
-        let move_idx = read_move();
-
-        if !play_field.make_move(&current_player, move_idx) {
-            println!("invalid move; try again!");
-            continue;
-        }
-
-        match play_field.check_win() {
-            Player::No => {
-                if !play_field.move_left() {
-                    play_field.print();
-                    println!("No player wins!");
-                    break;
-                }
-            }
-            pl @ _ => {
-                play_field.print();
-                println!("Player {} wins!", player_marker(&pl)); 
-                break;
-            }
-        }
-
-        current_player = if current_player == Player::Px { Player::Po } 
-                         else { Player::Px };
-    }
+    game_loop();
 }
 
 #[cfg(test)]
